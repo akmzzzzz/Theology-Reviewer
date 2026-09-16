@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to Theology — Comprehensive Interactive Quiz</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-heading: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #1f6feb;
+      --accent-glow: rgba(88, 166, 255, 0.15);
+      --correct-bg: rgba(46, 160, 67, 0.15);
+      --correct-border: #2ea043;
+      --correct-text: #3fb950;
+      --wrong-bg: rgba(248, 81, 73, 0.15);
+      --wrong-border: #f85149;
+      --wrong-text: #ff7b72;
+      --radius: 8px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f6f8fa;
+      --card-bg: #ffffff;
+      --border: #d0d7de;
+      --text: #24292f;
+      --text-heading: #0969da;
+      --text-muted: #57606a;
+      --accent: #0969da;
+      --accent-hover: #084298;
+      --accent-glow: rgba(9, 105, 218, 0.1);
+      --correct-bg: #dafbe1;
+      --correct-border: #1a7f37;
+      --correct-text: #1a7f37;
+      --wrong-bg: #ffebe9;
+      --wrong-border: #cf222e;
+      --wrong-text: #cf222e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+    }
+
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .meta-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Grid Jump */
+    .grid-jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1.25rem;
+      padding: 0.75rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .grid-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .grid-btn.current { border-color: var(--accent); color: var(--accent); font-weight: bold; }
+    .grid-btn.answered-correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
+    .grid-btn.answered-wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
+
+    /* Main Quiz Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      color: var(--text-heading);
+      margin-bottom: 1.25rem;
+      font-weight: 500;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.9rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .option-item:hover:not(.disabled) {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .option-item.correct {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--correct-text) !important;
+    }
+
+    .option-item.wrong {
+      background: var(--wrong-bg) !important;
+      border-color: var(--wrong-border) !important;
+      color: var(--wrong-text) !important;
+    }
+
+    .option-key {
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 1.25rem;
+    }
+
+    .explanation-panel {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .explanation-panel.show { display: block; }
+    .explanation-panel.correct { background: var(--correct-bg); border: 1px solid var(--correct-border); color: var(--correct-text); }
+    .explanation-panel.wrong { background: var(--wrong-bg); border: 1px solid var(--wrong-border); color: var(--wrong-text); }
+
+    /* Nav Buttons */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 0.65rem 1.3rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+    /* Summary Dashboard */
+    .summary-card {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .summary-score {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 1rem 0;
+    }
+
+    .review-list {
+      margin-top: 2rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .review-item {
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .review-item.pass { border-left: 4px solid var(--correct-border); }
+    .review-item.fail { border-left: 4px solid var(--wrong-border); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-top">
+      <h1>Introduction to Theology (Lesson 1)</h1>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+    <div class="filter-bar" id="category-filters">
+      <button class="filter-btn active" onclick="setCategory('ALL')">All Topics (29)</button>
+      <button class="filter-btn" onclick="setCategory('Definition & Nature')">Definition & Nature</button>
+      <button class="filter-btn" onclick="setCategory('Historical Eras')">Historical Eras</button>
+      <button class="filter-btn" onclick="setCategory('Branches of Theology')">Branches</button>
+      <button class="filter-btn" onclick="setCategory('Sources & Invocation')">Sources & Invocation</button>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-bar"></div>
+    </div>
+    <div class="meta-status">
+      <span id="question-indicator">Question 1 of 29</span>
+      <span id="score-indicator">Score: 0 / 0</span>
+    </div>
+  </header>
+
+  <div class="grid-jump" id="grid-jump"></div>
+
+  <div class="card" id="quiz-card">
+    <span class="category-badge" id="cat-badge">Category</span>
+    <h2 class="question-title" id="question-text">Loading question...</h2>
+    <div class="options-grid" id="options-box"></div>
+    <div class="explanation-panel" id="explanation-box"></div>
+    <div class="nav-controls">
+      <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()" disabled>&larr; Previous</button>
+      <button class="btn" id="next-btn" onclick="nextQuestion()">Next &rarr;</button>
+    </div>
+  </div>
+
+  <div class="summary-card" id="summary-card">
+    <h2>Review Completed</h2>
+    <div class="summary-score" id="final-score-display">0%</div>
+    <p id="final-remark" style="color: var(--text-muted);"></p>
+    <div style="margin-top: 1.5rem;">
+      <button class="btn" onclick="resetQuiz()">Retake Exam</button>
+    </div>
+    <div class="review-list" id="review-container"></div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  // 1. Definition of Theology
+  {
+    category: "Definition & Nature",
+    q: "Etymologically, the word 'theology' is derived from Greek 'theos' and 'logos', meaning:",
+    options: ["God and worship", "Any kind of knowledge about God", "Ritual law and prayer", "The mystery of salvation"],
+    answer: 1,
+    note: "Etymologically, 'theos' = God and 'logos' = knowledge/study, meaning any kind of knowledge about God."
+  },
+  {
+    category: "Definition & Nature",
+    q: "What is the essential definition of theology as a formal discipline?",
+    options: [
+      "Fides quaerens intellectum solum",
+      "Scientia de Deo ex revelatione acquisita (a science about God acquired from revealed principles)",
+      "Scientia Divina secundum rationem humanam",
+      "Exegesis biblica historica"
+    ],
+    answer: 1,
+    note: "The essential definition is 'a science about God acquired from revealed principles' (scientia de Deo ex revelatione acquisita)."
+  },
+
+  // 2. Historical: Pagan Era
+  {
+    category: "Historical Eras",
+    q: "Which Roman thinker systematized theology for Roman civic life, viewing religion as a practical tool to unify the Republic and maintain social order?",
+    options: ["Cicero", "Varro", "Seneca", "Tacitus"],
+    answer: 1,
+    note: "Varro (116–27 B.C.) systematized theology for Roman civic and intellectual life to preserve social stability."
+  },
+  {
+    category: "Historical Eras",
+    q: "In Plato's Republic (379A), what did to 'theologize' (theologein) originally signify?",
+    options: [
+      "To formulate systematic ecclesiastical dogma",
+      "To mythologize, i.e., to tell myths of Olympian gods or explain mysteries through them",
+      "To worship the Caesar as divine",
+      "To defend philosophical monotheism"
+    ],
+    answer: 1,
+    note: "Plato defined theologein as mythologizing; theologians were poets like Homer who composed theogonies."
+  },
+  {
+    category: "Historical Eras",
+    q: "What was Plato's philosophical critique of traditional poetic theogonies?",
+    options: [
+      "Poetry must be banned completely from society without exception",
+      "He rejected anthropomorphic and morally flawed depictions of gods; poetry about gods must conform to truth, virtue, and reason",
+      "Poets should focus exclusively on empirical mathematics",
+      "Only the Emperor should be worshiped by poets"
+    ],
+    answer: 1,
+    note: "Plato rejected anthropomorphic, morally flawed depictions of gods, insisting poetry conform to truth, virtue, and reason."
+  },
+  {
+    category: "Historical Eras",
+    q: "Aristotle (Metaphysics 102a19-22) divided science into Physical, Mathematical, and Theological. How did he rank Theological science?",
+    options: [
+      "Subordinate to Mathematics",
+      "A purely subjective art",
+      "As supreme or first science, and Wisdom absolutely",
+      "As an auxiliary branch of Physics"
+    ],
+    answer: 2,
+    note: "Aristotle considered theological knowledge (episteme) supreme, examining reality through the highest cause and principle: God."
+  },
+  {
+    category: "Historical Eras",
+    q: "In the Hellenistic Imperial Cult context, how did the meaning of 'theologein' shift?",
+    options: [
+      "It became synonymous with Socratic dialogue",
+      "It shifted to emperor worship—attributing divinity to Caesar, acknowledging him as a god, and praising him as divine",
+      "It was transformed into an exegesis of Old Testament texts",
+      "It was restricted to temple priests performing sacrifices"
+    ],
+    answer: 1,
+    note: "Under the Imperial Cult, theologein shifted to venerating and worshiping the emperor as divine."
+  },
+
+  // 2. Historical: Patristic Period
+  {
+    category: "Historical Eras",
+    q: "Which early Greek Father abstracted a higher Christian meaning from the pagan sense of 'theology' to apply it to the knowledge of God?",
+    options: ["Clement of Alexandria", "Tertullian", "Irenaeus of Lyons", "Ignatius of Antioch"],
+    answer: 0,
+    note: "Clement of Alexandria abstracted a higher, purified Christian meaning from the pagan concept of theology."
+  },
+  {
+    category: "Historical Eras",
+    q: "Origen of Alexandria shifted the term 'theologein' from emperor worship to what Christian confession?",
+    options: [
+      "To venerate the Roman Senate",
+      "To confess Christ as God",
+      "To celebrate monastic withdrawal",
+      "To debate Greek rhetoricians"
+    ],
+    answer: 1,
+    note: "Origen referred to theology as 'teaching about God and Christ' and shifted theologein to 'to confess Christ as God'."
+  },
+  {
+    category: "Historical Eras",
+    q: "Why did Eusebius of Caesarea explicitly bestow the title 'the Theologian' on St. John?",
+    options: [
+      "Because John was the oldest surviving Apostle",
+      "Because of the sublime doctrine about God in his Gospel, deliberately redefining theologia with Christian meaning",
+      "Because John studied under Plato in Athens",
+      "Because John organized the first Church Council"
+    ],
+    answer: 1,
+    note: "Eusebius completed the Christian sublimation of theological terms, calling St. John 'the Theologian' due to his Gospel's doctrine."
+  },
+  {
+    category: "Historical Eras",
+    q: "In De Civitate Dei, St. Augustine critiqued Varro by contrasting pagan gods with the Christian God. How did he describe them?",
+    options: [
+      "Pagan gods are theoi phusei; Christian God is theos thesei",
+      "Pagan gods are gods by convention (theoi thesei); the Christian God is God by nature (theos phusei)",
+      "Both systems are identical expressions of divine light",
+      "Pagan gods are mythological abstractions; God is pure geometry"
+    ],
+    answer: 1,
+    note: "Augustine critiqued Varro's civic utility, arguing pagan gods were merely conventional (theoi thesei), whereas the true God is God by nature (theos phusei)."
+  },
+
+  // 2. Historical: Middle Ages & Renaissance
+  {
+    category: "Historical Eras",
+    q: "Who defined theology as an ordered treatise/intellectual discipline 'about God himself rather than the theology of the mystery of Christ'?",
+    options: ["Peter Abelard", "Anselm of Canterbury", "Bernard of Clairvaux", "Duns Scotus"],
+    answer: 0,
+    note: "Peter Abelard defined theology as an ordered body of knowledge/discipline about God Himself."
+  },
+  {
+    category: "Historical Eras",
+    q: "In St. Thomas Aquinas's distinction, what is 'Scientia Divina' (also called natural theology/first philosophy)?",
+    options: [
+      "Reflection on revelation accepted by faith and sacra scriptura",
+      "Philosophical reflection on God based on natural reason alone, yielding divine knowledge rather than direct knowledge of God",
+      "The mystical contemplation of monastic orders",
+      "Canon law regulating church sacraments"
+    ],
+    answer: 1,
+    note: "Scientia Divina is philosophical theology rooted in natural reason alone; Scientia Dei is sacred theology rooted in revelation accepted by faith."
+  },
+  {
+    category: "Historical Eras",
+    q: "How did St. Bonaventure describe theology, distinguishing his Franciscan perspective from Aquinas?",
+    options: [
+      "As a purely mathematical and syllogistic science",
+      "As a salvific and practical science of love of God, emphasizing the Will over the Intellect",
+      "As an apologetic weapon against secular philosophers",
+      "As an empirical investigation into natural physics"
+    ],
+    answer: 1,
+    note: "Bonaventure defined theology as a practical science of love of God, placing the Will above the Intellect."
+  },
+
+  // 2. Historical: Reformation & Modern
+  {
+    category: "Historical Eras",
+    q: "The Council of Trent (1545–1563) and the Counter-Reformation culminated in manualistic theology. What was its primary methodology?",
+    options: ["Controversialist-apologetic", "Interreligious-syncretic", "Purely sociological", "Ecumenical dialogue"],
+    answer: 0,
+    note: "Manualistic theology standardized post-Trent seminary education with a strongly controversialist-apologetic focus."
+  },
+  {
+    category: "Historical Eras",
+    q: "How did the Second Vatican Council (Modern Period) transform the perspective of Catholic theology?",
+    options: [
+      "It revived strict manualistic apologetics against Protestantism",
+      "It enabled theology to dialogue amicably with other cultures and sciences, emphasizing complementarity and human life",
+      "It discarded Dogmatic theology in favor of pure sociology",
+      "It declared philosophy irrelevant to theological study"
+    ],
+    answer: 1,
+    note: "Vatican II moved theology away from defensive apologetics toward amicable dialogue, complementarity with modern sciences, and human flourishing."
+  },
+
+  // 3. Nature of Theology
+  {
+    category: "Definition & Nature",
+    q: "Why does theology possess the property of being nobler ('Dignior') than other human sciences?",
+    options: [
+      "Because theologians hold political office in the Church",
+      "Because Sacred Theology considers God as the first efficient cause of all things that are the objects of other sciences",
+      "Because it does not utilize human logic or language",
+      "Because it is the newest academic discipline"
+    ],
+    answer: 1,
+    note: "Theology is 'Dignior' (nobler) because it studies God, who is the first efficient cause of all realities investigated by other disciplines."
+  },
+
+  // 4. Branches: Dogmatic & Sub-branches
+  {
+    category: "Branches of Theology",
+    q: "What is the scope of Christian Anthropology as a branch of Dogmatic Theology?",
+    options: [
+      "The study of ancient church ruins and archaeological artifacts",
+      "Creation and the development of the whole person (body, mind, spiritual powers), including Angelology and Demonology",
+      "The statistical census of baptized Christians globally",
+      "The biological classification of living organisms"
+    ],
+    answer: 1,
+    note: "Christian Anthropology studies creation and the whole human person, and encompasses Angelology (angels) and Demonology (demons)."
+  },
+  {
+    category: "Branches of Theology",
+    q: "Which specific branch of Dogmatic Theology studies the mystery of the Holy Spirit?",
+    options: ["Pneumatology", "Soteriology", "Eschatology", "Christology"],
+    answer: 0,
+    note: "Pneumatology is the theological treatise on the person and mystery of the Holy Spirit."
+  },
+  {
+    category: "Branches of Theology",
+    q: "How do Christology and Soteriology differ in systematic theology?",
+    options: [
+      "Christology studies the Sacraments; Soteriology studies Mary",
+      "Christology studies the life and person of Jesus; Soteriology studies Jesus specifically as the Savior and His work of salvation",
+      "Christology is Old Testament; Soteriology is New Testament",
+      "They are identical with no formal distinction"
+    ],
+    answer: 1,
+    note: "Christology focuses on Jesus' life and person; Soteriology focuses on His salvific mission as Savior."
+  },
+  {
+    category: "Branches of Theology",
+    q: "What is the subject matter of Eschatology?",
+    options: [
+      "The historical origins of the Papacy",
+      "The study of the last things or the eschaton (death, judgment, heaven, hell)",
+      "The validity of liturgical vestments",
+      "The transmission of scriptural manuscripts"
+    ],
+    answer: 1,
+    note: "Eschatology studies the 'last things' (the eschaton) and ultimate human destiny."
+  },
+
+  // 4. Branches: Biblical, Historical, Moral, Practical
+  {
+    category: "Branches of Theology",
+    q: "How does Biblical Theology primarily conduct its study?",
+    options: [
+      "Through systematic scholastic manuals without reference to history",
+      "Through exegesis, correlating ideas with historical facts, synthesizing them within the history of revelation",
+      "Exclusively by translating Hebrew grammar without theological synthesis",
+      "By subordinating Scripture entirely to pagan philosophy"
+    ],
+    answer: 1,
+    note: "Biblical Theology works through exegesis, correlates ideas with facts, and synthesizes them within the history of revelation."
+  },
+  {
+    category: "Branches of Theology",
+    q: "Which of the following lists the four main chronological periods studied in Historical Theology?",
+    options: [
+      "Ancient, Classical, Medieval, Post-Modern",
+      "Patristic (100–400), Middle Ages & Renaissance (500–1500), Reformation & Post-Reformation (1500–1750), Modern (1750–present)",
+      "Apostolic, Crusades, Enlightenment, Contemporary",
+      "Old Testament, Intertestamental, New Testament, Apostolic"
+    ],
+    answer: 1,
+    note: "The four periods are: Patristic (100–400), Middle Ages & Renaissance (500–1500), Reformation & Post-Reformation (1500–1750), Modern (1750–present)."
+  },
+  {
+    category: "Branches of Theology",
+    q: "Why is Moral Theology defined as the 'science of human freedom'?",
+    options: [
+      "Because it advocates total political libertarianism",
+      "Because it studies human conduct precisely as human—deliberate actions done under the influence of free will directed toward a supernatural destiny",
+      "Because it frees man from any religious obligations",
+      "Because it studies civil legal codes in democratic states"
+    ],
+    answer: 1,
+    note: "Moral Theology is the science of human freedom, analyzing deliberate human actions guided by faith and reason toward our supernatural end."
+  },
+  {
+    category: "Branches of Theology",
+    q: "Practical Theology examines religious practices to align theory and practice. What two key disciplines does it include?",
+    options: [
+      "Physics and Chemistry",
+      "Missiology and Inculturation",
+      "Epistemology and Logic",
+      "Archaeology and Paleography"
+    ],
+    answer: 1,
+    note: "Practical (Pastoral/Spiritual) Theology includes Missiology (missions) and Inculturation."
+  },
+
+  // 5. Sources of Theology
+  {
+    category: "Sources & Invocation",
+    q: "What are the two Constitutive Sources of Theology?",
+    options: [
+      "Human Reason and Civil Law",
+      "Sacred Scriptures and Sacred Tradition of the Church",
+      "The Popes and Secular Philosophers",
+      "Church Architecture and Sacred Art"
+    ],
+    answer: 1,
+    note: "The Constitutive Sources are Sacred Scripture and Sacred Tradition."
+  },
+  {
+    category: "Sources & Invocation",
+    q: "Why is Sacred Tradition considered older, fuller, and self-sufficient in relation to Sacred Scripture?",
+    options: [
+      "Tradition existed since the first parents, predates written Scripture, and the canon of inspired books is recognized through Tradition",
+      "The Apostles rejected the written word and only allowed oral speech",
+      "Scripture has been lost over time, leaving only Tradition",
+      "Tradition was invented by Church Councils in the Middle Ages"
+    ],
+    answer: 0,
+    note: "Tradition predates Scripture, expresses the fullness of revelation, and established the canon of inspired Scripture itself."
+  },
+  {
+    category: "Sources & Invocation",
+    q: "Which of the following is classified as an Infallible Interpretative Source of theology?",
+    options: [
+      "Academic professors of theology",
+      "The Church (Ecclesia credens/docens), the Popes (Ordinary Magisterium), and Church Councils (Extraordinary Magisterium)",
+      "The Church Fathers acting strictly as private theologians",
+      "Secular historians"
+    ],
+    answer: 1,
+    note: "Infallible interpretative sources include the believing and teaching Church, the Ordinary Magisterium of the Popes, and the Extraordinary Magisterium of Councils."
+  },
+  {
+    category: "Sources & Invocation",
+    q: "Under what category are Human Reason, Philosophers, and History classified in theology?",
+    options: ["Constitutive Sources", "Infallible Interpretative Sources", "Auxiliary Sources", "Dogmatic Treatises"],
+    answer: 2,
+    note: "Auxiliary sources include Human Reason, Philosophers, and History/human traditions."
+  },
+
+  // 6. Invocation to the Holy Spirit
+  {
+    category: "Sources & Invocation",
+    q: "What is the ultimate purpose of the Invocation to the Holy Spirit in theological study?",
+    options: [
+      "To bypass the need for reading texts or study",
+      "To enlighten minds and hearts so actions and understanding align with God's will for His glorification",
+      "To receive immediate personal revelations that supersede the Church canon",
+      "To debate secular philosophers on equal academic footing"
+    ],
+    answer: 1,
+    note: "The Invocation asks the Holy Spirit to enlighten minds and hearts, granting grace to respond to the Father's love through Christ and align with God's will for His glorification."
+  }
+];
+
+let activeFilter = 'ALL';
+let filteredList = [...quizData];
+let currentIndex = 0;
+let userAnswers = {};
+
+const qText = document.getElementById('question-text');
+const optionsBox = document.getElementById('options-box');
+const explanationBox = document.getElementById('explanation-box');
+const catBadge = document.getElementById('cat-badge');
+const qIndicator = document.getElementById('question-indicator');
+const scoreIndicator = document.getElementById('score-indicator');
+const progressBar = document.getElementById('progress-bar');
+const gridJump = document.getElementById('grid-jump');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const quizCard = document.getElementById('quiz-card');
+const summaryCard = document.getElementById('summary-card');
+
+function initGrid() {
+  gridJump.innerHTML = '';
+  filteredList.forEach((_, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'grid-btn';
+    btn.textContent = idx + 1;
+    btn.onclick = () => jumpToQuestion(idx);
+    gridJump.appendChild(btn);
+  });
+}
+
+function updateGridStyles() {
+  const btns = gridJump.querySelectorAll('.grid-btn');
+  btns.forEach((btn, idx) => {
+    btn.className = 'grid-btn';
+    if (idx === currentIndex) btn.classList.add('current');
+    if (userAnswers[idx] !== undefined) {
+      if (userAnswers[idx] === filteredList[idx].answer) {
+        btn.classList.add('answered-correct');
+      } else {
+        btn.classList.add('answered-wrong');
+      }
+    }
+  });
+}
+
+function renderQuestion() {
+  const item = filteredList[currentIndex];
+  catBadge.textContent = item.category;
+  qText.textContent = item.q;
+  qIndicator.textContent = `Question ${currentIndex + 1} of ${filteredList.length}`;
+  
+  optionsBox.innerHTML = '';
+  explanationBox.className = 'explanation-panel';
+  explanationBox.innerHTML = '';
+
+  const hasAnswered = userAnswers[currentIndex] !== undefined;
+
+  item.options.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option-item';
+    if (hasAnswered) div.classList.add('disabled');
+
+    const key = document.createElement('span');
+    key.className = 'option-key';
+    key.textContent = `${String.fromCharCode(65 + idx)}.`;
+
+    const label = document.createElement('span');
+    label.textContent = opt;
+
+    div.appendChild(key);
+    div.appendChild(label);
+
+    if (hasAnswered) {
+      if (idx === item.answer) div.classList.add('correct');
+      if (userAnswers[currentIndex] === idx && idx !== item.answer) div.classList.add('wrong');
+    } else {
+      div.onclick = () => selectAnswer(idx);
+    }
+
+    optionsBox.appendChild(div);
+  });
+
+  if (hasAnswered) {
+    showExplanation(userAnswers[currentIndex] === item.answer);
+  }
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.textContent = (currentIndex === filteredList.length - 1) ? 'Finish & Review' : 'Next →';
+  updateProgress();
+  updateGridStyles();
+}
+
+function selectAnswer(selectedIdx) {
+  if (userAnswers[currentIndex] !== undefined) return;
+  userAnswers[currentIndex] = selectedIdx;
+  renderQuestion();
+}
+
+function showExplanation(isCorrect) {
+  const item = filteredList[currentIndex];
+  explanationBox.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  explanationBox.innerHTML = `<strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect.'}</strong> ${item.note}`;
+}
+
+function updateProgress() {
+  const answeredCount = Object.keys(userAnswers).length;
+  const correctCount = Object.keys(userAnswers).filter(k => userAnswers[k] === filteredList[k].answer).length;
+  scoreIndicator.textContent = `Score: ${correctCount} / ${answeredCount}`;
+  progressBar.style.width = `${((currentIndex + 1) / filteredList.length) * 100}%`;
+}
+
+function jumpToQuestion(idx) {
+  currentIndex = idx;
+  renderQuestion();
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion();
+  }
+}
+
+function nextQuestion() {
+  if (currentIndex < filteredList.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  } else {
+    showSummary();
+  }
+}
+
+function setCategory(cat) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(cat) || (cat === 'ALL' && b.textContent.includes('All')));
+  });
+
+  filteredList = (cat === 'ALL') ? [...quizData] : quizData.filter(d => d.category === cat);
+  currentIndex = 0;
+  userAnswers = {};
+  quizCard.style.display = 'block';
+  summaryCard.style.display = 'none';
+  initGrid();
+  renderQuestion();
+}
+
+function showSummary() {
+  quizCard.style.display = 'none';
+  summaryCard.style.display = 'block';
+
+  const total = filteredList.length;
+  const correct = Object.keys(userAnswers).filter(k => userAnswers[k] === filteredList[k].answer).length;
+  const pct = Math.round((correct / total) * 100) || 0;
+
+  document.getElementById('final-score-display').textContent = `${pct}% (${correct}/${total})`;
+  
+  let remark = '';
+  if (pct === 100) remark = 'Flawless recall of all concepts, authors, and source classifications!';
+  else if (pct >= 80) remark = 'Excellent mastery of theological definitions, historical periods, and divisions.';
+  else if (pct >= 60) remark = 'Solid grasp. Review the distinctions between sources and dogmatic branches.';
+  else remark = 'Recommended to re-read the lesson notes on historical development and sources.';
+  document.getElementById('final-remark').textContent = remark;
+
+  const reviewBox = document.getElementById('review-container');
+  reviewBox.innerHTML = '';
+
+  filteredList.forEach((item, idx) => {
+    const userChoice = userAnswers[idx];
+    const isCorrect = userChoice === item.answer;
+    const div = document.createElement('div');
+    div.className = `review-item ${isCorrect ? 'pass' : 'fail'}`;
+
+    div.innerHTML = `
+      <strong>Q${idx + 1}: ${item.q}</strong><br/>
+      <span style="color: ${isCorrect ? 'var(--correct-text)' : 'var(--wrong-text)'}">
+        Your Answer: ${userChoice !== undefined ? item.options[userChoice] : 'Unanswered'}
+      </span><br/>
+      ${!isCorrect ? `<span>Correct: <strong>${item.options[item.answer]}</strong></span><br/>` : ''}
+      <small style="color: var(--text-muted);">${item.note}</small>
+    `;
+    reviewBox.appendChild(div);
+  });
+}
+
+function resetQuiz() {
+  userAnswers = {};
+  currentIndex = 0;
+  summaryCard.style.display = 'none';
+  quizCard.style.display = 'block';
+  renderQuestion();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+}
+
+// Initial Run
+initGrid();
+renderQuestion();
+</script>
+</body>
+</html>
